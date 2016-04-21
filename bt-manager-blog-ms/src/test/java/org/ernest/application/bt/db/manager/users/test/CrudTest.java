@@ -16,8 +16,6 @@ import org.springframework.boot.test.WebIntegrationTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.client.RestTemplate;
 
-import com.google.gson.Gson;
-
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(Application.class)
 @WebIntegrationTest({"server.port=0"})
@@ -27,7 +25,7 @@ public class CrudTest {
 	String port;
 	
 	@Test
-	public void crd(){
+	public void crd() throws InterruptedException{
 		CreatePostInput input = new CreatePostInput();
 		input.setTitle("title-to-test-will-be-deleted");
 		input.setDescription("description");
@@ -42,7 +40,7 @@ public class CrudTest {
 		PostInformation postInformation = postInformationList.stream().filter( info -> info.getTitle().equals(input.getTitle())).findAny().get();
 		new RestTemplate().getForObject("http://localhost:"+port+"/delete/"+postInformation.get_id(), String.class);
 		
-		
+		Thread.sleep(1000L);
 		postInformationList = Arrays.asList(new RestTemplate().getForObject("http://localhost:"+port+"/retrieveall", PostInformation[].class));
 		postInformation = postInformationList.stream().filter( info -> info.getTitle().equals(input.getTitle())).findAny().orElse(null);
 		Assert.assertTrue(postInformation == null);		
